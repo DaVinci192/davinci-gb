@@ -1,0 +1,50 @@
+src/
+├── lib.rs
+│
+├── core/                    # Pure emulation logic
+│   ├── mod.rs
+│   ├── gameboy.rs
+│   ├── cpu/
+│   │   ├── mod.rs
+│   │   ├── cpu.rs
+│   │   ├── execute.rs
+│   │   ├── alu.rs
+│   │   └── interrupts.rs
+│   ├── bus/
+│   │   ├── mod.rs
+│   │   └── bus.rs
+│   └── memory/
+│       ├── mod.rs
+│       └── map.rs
+│
+├── debugger/               # Backend control + exported views
+│   ├── mod.rs
+│   ├── backend.rs          # Debugger struct, stepping, breakpoints
+│   ├── snapshot.rs         # CpuSnapshot / DebugSnapshot structs
+│   ├── disasm.rs           # Disassembly generation
+│   ├── breakpoints.rs
+│   └── trace.rs
+│
+├── frontend/               # UI only
+│   ├── mod.rs
+│   ├── app.rs              # Main UI coordinator
+│   ├── panels/
+│   │   ├── mod.rs
+│   │   ├── cpu_panel.rs
+│   │   ├── disasm_panel.rs
+│   │   ├── memory_panel.rs
+│   │   ├── controls_panel.rs
+│   │   └── breakpoints_panel.rs
+│   └── widgets/
+│       ├── mod.rs
+│       ├── register_grid.rs
+│       └── flag_badge.rs
+│
+├── app/                    # Program composition / runner
+│   ├── mod.rs
+│   └── runner.rs
+│
+└── tests/
+    ├── cpu_tests.rs
+    ├── opcode_tests.rs
+    └── blargg.rs
