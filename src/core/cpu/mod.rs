@@ -5,12 +5,11 @@ pub mod alu;
 pub mod core;
 pub mod instructions;
 pub mod flags;
-pub mod bus;
 
 use flags::{Flags};
-use bus::Bus;
+use super::bus::Bus;
 
-pub type Op = fn(&mut CPU);
+pub type Op = fn(&mut CpuExec);
 
 pub struct CPU {
     // internal registers
@@ -40,8 +39,6 @@ pub struct CPU {
 
     pub temp: u8,
     pub temp16: u16,
-
-    pub bus: Bus,
     
     pub step: u8,
 
@@ -51,3 +48,7 @@ pub struct CPU {
     pub t_cycles: u64,
 }
 
+pub struct CpuExec<'a> {
+    pub cpu: &'a mut CPU,
+    pub bus: &'a mut Bus,
+}

@@ -1,71 +1,55 @@
 
+use crate::core::cpu::CpuExec;
+use super::Bus;
+
 use super::CPU;
 use super::decoder::{CB_DISPATCH, DISPATCH};
 use super::instructions::jumps_calls::{op_isr_40, op_isr_48, op_isr_50, op_isr_58, op_isr_60};
+use super::instructions::op_fetch_next;
 
 impl CPU {
-    pub fn fetch_byte(&mut self) -> u8 {
-        let byte = self.bus.read8(self.pc);
-
-        if self.halt_bug {
-            // do not increment pc
-            self.halt_bug = false;
-        } else {
-            self.pc = self.pc.wrapping_add(1);
-        }
-
-        byte
-    }
-
-    pub fn step_instruction(&mut self) {
+    pub fn step_instruction(&mut self, bus: &mut Bus) {
         loop {
-            self.cycle();
+            self.cycle(bus);
             if self.step == 1 {
                 break;
             }
         }
     }
 
-    pub fn cycle(&mut self) {
-        if self.halted {
-            if (self.ie & self.iflag) != 0 {
-                self.halted = false;
+    pub fn cycle(&mut self, bus: &mut Bus) {
+        let mut ctx = CpuExec { cpu: self, bus };
+
+        if ctx.cpu.halted {
+            if (ctx.cpu.ie & ctx.cpu.iflag) != 0 {
+                ctx.cpu.halted = false;
             } else {
                 return;
             }
         }
 
-        if self.step == 0 {
-            let opcode = self.ir;
+        if ctx.cpu.step == 0 {
+            let opcode = ctx.cpu.ir;
             
-            if self.handle_interrupts() {
+            if ctx.cpu.handle_interrupts() {
                 return;
             }
             
-            if self.ime_scheduled {
-                self.ime = true;
-                self.ime_scheduled = false;
+            if ctx.cpu.ime_scheduled {
+                ctx.cpu.ime = true;
+                ctx.cpu.ime_scheduled = false;
             }
 
-            self.schedule_next_instruction(opcode);
+            schedule_next_instruction(&mut ctx, opcode);
         } else {
-            (self.current_op)(self);
+            (ctx.cpu.current_op)(&mut ctx);
 
-            self.m_cycles += 1;
-            self.t_cycles += 1;
+            ctx.cpu.m_cycles += 1;
+            ctx.cpu.t_cycles += 1;
         }
     }
 
-    pub fn schedule_next_instruction(&mut self, opcode: u8) {
-        if opcode == 0xCB {
-            let cb = self.fetch_byte();
-            self.current_op = CB_DISPATCH[cb as usize];
-        } else {
-            self.current_op = DISPATCH[opcode as usize];
-        }
 
-        self.step = 1;
-    }
 
     pub fn handle_interrupts(&mut self) -> bool {
         if !self.ime { return false; }
@@ -88,4 +72,16 @@ impl CPU {
         true
     }
 
+}
+
+fn schedule_next_instruction(ctx: &mut CpuExec, opcode: u8) {
+    if opcode == 0xCB {
+        op_fetch_next(ctx);
+        let cb = ctx.cpu.ir;
+        ctx.cpu.current_op = CB_DISPATCH[cb as usize];
+    } else {
+        ctx.cpu.current_op = DISPATCH[opcode as usize];
+    }
+
+    ctx.cpu.step = 1;
 }

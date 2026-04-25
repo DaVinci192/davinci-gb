@@ -1,4 +1,4 @@
-use super::CPU;
+use super::CpuExec;
 
 use super::instructions::arithmetic_16::*;
 use super::instructions::arithmetic_8::*;
@@ -12,9 +12,9 @@ use super::instructions::stack::*;
 
 
 
-pub fn op_invalid(_cpu: &mut CPU) { }
+pub fn op_invalid(_ctx: &mut CpuExec) { }
 
-type OpFn = fn(&mut CPU);
+type OpFn = fn(&mut CpuExec);
 
 pub static DISPATCH: [OpFn; 256] = [
 /* 00 */ op_nop,       op_ld_bc_n16, op_ld_bc_a,  op_inc_bc, op_inc_b,      op_dec_b,      op_ld_b_n8,  op_rlca,
