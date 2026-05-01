@@ -5,3 +5,5 @@ https://gbdev.io/gb-opcodes//optables/classicoctal
 
 https://www.reddit.com/r/EmuDev/comments/1eklgl3/gb_emulator_cycle_accurate_interrupts/
 
+Timer stuff
+https://github.com/Ashiepaws/GBEDG/blob/master/timers/index.md

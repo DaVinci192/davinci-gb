@@ -1,0 +1,4 @@
+Debugger UIs
+Gameboy: https://charliehart.dev/misc/gameboy-emulator-part2-en/
+https://us1.discourse-cdn.com/flex020/uploads/arduboy/original/3X/f/5/f5d793ae91bd426a6c2a650ecfdc5d90c8c0d40d.png
+Z80: https://floooh.github.io/virtualkc/p025_debuggerui.html
