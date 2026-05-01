@@ -26,7 +26,7 @@ pub fn op_add_sp_e8(ctx: &mut CpuExec) {
     match ctx.cpu.step {
         1 => { op_read_n8(ctx); },
         2 => { 
-            alu::alu_add_sp_e8(ctx.cpu, ctx.cpu.temp);
+            ctx.cpu.sp = alu::alu_add_sp_e8(ctx.cpu, ctx.cpu.temp);
             ctx.cpu.step += 1;
         },
         3 => {
@@ -118,7 +118,7 @@ pub fn op_ld_n16_sp(ctx: &mut CpuExec) {
             ctx.cpu.step += 1;
         },
         4 => {
-            let msb = (ctx.cpu.pc >> 8) as u8;
+            let msb = (ctx.cpu.sp >> 8) as u8;
             ctx.bus.write8(ctx.cpu.temp16, msb);
 
             ctx.cpu.step += 1;
@@ -135,12 +135,12 @@ pub fn op_ld_hl_sp_e8(ctx: &mut CpuExec) {
     match ctx.cpu.step {
         1 => { op_read_n8(ctx); },
         2 => { 
-            alu::alu_add_sp_e8(ctx.cpu, ctx.cpu.temp);
+            let result = alu::alu_add_sp_e8(ctx.cpu, ctx.cpu.temp);
+            ctx.cpu.set_reg16(Reg16::HL, result);
             ctx.cpu.step += 1;
         },
         3 => {
             // technically msb part of sp_e8 would be performed here
-            ctx.cpu.set_reg16(Reg16::HL, ctx.cpu.sp);
             op_fetch_next(ctx);
         },
         _ => unreachable!(),

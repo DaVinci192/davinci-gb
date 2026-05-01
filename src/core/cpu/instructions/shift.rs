@@ -26,7 +26,12 @@ pub fn op_rl_h(ctx: &mut CpuExec) { op_rl_r8(ctx, Reg::H); }
 pub fn op_rl_l(ctx: &mut CpuExec) { op_rl_r8(ctx, Reg::L); }
 pub fn op_rl_a(ctx: &mut CpuExec) { op_rl_r8(ctx, Reg::A); }
 
-pub fn op_rla(ctx: &mut CpuExec) { alu::alu_rla(ctx.cpu); }
+pub fn op_rla(ctx: &mut CpuExec) { 
+    debug_assert!(ctx.cpu.step == 1);
+    
+    alu::alu_rla(ctx.cpu);
+    op_fetch_next(ctx);
+}
 
 pub fn op_rl_hl(ctx: &mut CpuExec) {
     match ctx.cpu.step {
@@ -62,7 +67,12 @@ pub fn op_rlc_h(ctx: &mut CpuExec) { op_rlc_r8(ctx, Reg::H); }
 pub fn op_rlc_l(ctx: &mut CpuExec) { op_rlc_r8(ctx, Reg::L); }
 pub fn op_rlc_a(ctx: &mut CpuExec) { op_rlc_r8(ctx, Reg::A); }
 
-pub fn op_rlca(ctx: &mut CpuExec) { alu::alu_rlca(ctx.cpu); }
+pub fn op_rlca(ctx: &mut CpuExec) { 
+    debug_assert!(ctx.cpu.step == 1);
+    
+    alu::alu_rlca(ctx.cpu);
+    op_fetch_next(ctx);
+}
 
 pub fn op_rlc_hl(ctx: &mut CpuExec) {
     match ctx.cpu.step {
@@ -97,7 +107,12 @@ pub fn op_rr_h(ctx: &mut CpuExec) { op_rr_r8(ctx, Reg::H); }
 pub fn op_rr_l(ctx: &mut CpuExec) { op_rr_r8(ctx, Reg::L); }
 pub fn op_rr_a(ctx: &mut CpuExec) { op_rr_r8(ctx, Reg::A); }
 
-pub fn op_rra(ctx: &mut CpuExec) { alu::alu_rra(ctx.cpu); }
+pub fn op_rra(ctx: &mut CpuExec) { 
+    debug_assert!(ctx.cpu.step == 1);
+    
+    alu::alu_rra(ctx.cpu);
+    op_fetch_next(ctx);
+}
 
 pub fn op_rr_hl(ctx: &mut CpuExec) {
     match ctx.cpu.step {
@@ -132,7 +147,12 @@ pub fn op_rrc_h(ctx: &mut CpuExec) { op_rrc_r8(ctx, Reg::H); }
 pub fn op_rrc_l(ctx: &mut CpuExec) { op_rrc_r8(ctx, Reg::L); }
 pub fn op_rrc_a(ctx: &mut CpuExec) { op_rrc_r8(ctx, Reg::A); }
 
-pub fn op_rrca(ctx: &mut CpuExec) { alu::alu_rrca(ctx.cpu); }
+pub fn op_rrca(ctx: &mut CpuExec) { 
+    debug_assert!(ctx.cpu.step == 1);
+    
+    alu::alu_rrca(ctx.cpu);
+    op_fetch_next(ctx);
+}
 
 pub fn op_rrc_hl(ctx: &mut CpuExec) {
     match ctx.cpu.step {
@@ -207,9 +227,10 @@ pub fn op_sra_hl(ctx: &mut CpuExec) {
         2 => {
             let res = alu::alu_sra(ctx.cpu, ctx.cpu.temp);
             ctx.cpu.temp = res;
-            ctx.cpu.step += 1;
+
+            op_write_hl(ctx);
         },
-        3 => op_write_hl(ctx),
+        3 => op_fetch_next(ctx),
         _ => unreachable!(),
     }
 }

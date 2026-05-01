@@ -48,9 +48,9 @@ pub static DISPATCH: [OpFn; 256] = [
 /* C8 */ op_ret_z, op_ret, op_jp_z_n16, op_cb_prefix, op_call_z_n16, op_call_n16, op_adc_a_n8, op_rst_08,
 /* D0 */ op_ret_nc, op_pop_de, op_jp_nc_n16, op_invalid, op_call_nc_n16, op_push_de, op_sub_a_n8, op_rst_10,
 /* D8 */ op_ret_c, op_reti, op_jp_c_n16, op_invalid, op_call_c_n16, op_invalid, op_sbc_a_n8, op_rst_18,
-/* E0 */ op_ldh_a_n, op_pop_hl, op_ldh_c_a, op_invalid, op_invalid, op_push_hl, op_and_a_n8, op_rst_20,
+/* E0 */ op_ldh_n_a, op_pop_hl, op_ldh_c_a, op_invalid, op_invalid, op_push_hl, op_and_a_n8, op_rst_20,
 /* E8 */ op_add_sp_e8, op_jp_hl, op_ld_n16_a, op_invalid, op_invalid, op_invalid, op_xor_a_n8, op_rst_28,
-/* F0 */ op_ldh_n_a, op_pop_af, op_ld_a_c, op_di, op_invalid, op_push_af, op_or_a_n8, op_rst_30,
+/* F0 */ op_ldh_a_n, op_pop_af, op_ldh_a_c, op_di, op_invalid, op_push_af, op_or_a_n8, op_rst_30,
 /* F8 */ op_ld_hl_sp_e8, op_ld_sp_hl, op_ld_a_n16, op_ei, op_invalid, op_invalid, op_cp_a_n8, op_rst_38,
 ];
 

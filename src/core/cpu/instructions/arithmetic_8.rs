@@ -288,30 +288,42 @@ pub fn op_daa(ctx: &mut CpuExec) {
         let mut adj = 0u8;
 
         if ctx.cpu.f.h {
-            adj = adj.wrapping_add(0x6);
+            adj |= 0x06;
         }
 
         if ctx.cpu.f.c {
-            adj = adj.wrapping_add(0x60);
+            adj |= 0x60;
         }
 
-        ctx.cpu.a = ctx.cpu.a.wrapping_sub(adj);
+        let result = ctx.cpu.a.wrapping_sub(adj);
+
+        ctx.cpu.f.z = result == 0;
+        ctx.cpu.f.h = false;
+
+        ctx.cpu.a = result;
+
+
     } else {
         let mut adj = 0u8;
+        let carry = ctx.cpu.f.c || (ctx.cpu.a > 0x99);
 
         if ctx.cpu.f.h || ((ctx.cpu.a & 0xF) > 9) {
-            adj = adj.wrapping_add(6);
+            adj |= 0x06;
         }
 
-        if ctx.cpu.f.c || (ctx.cpu.a > 0x99) {
-            adj = adj.wrapping_add(0x60);
-            ctx.cpu.f.c = true;
+        if carry {
+            adj |= 0x60;
         }
 
-        ctx.cpu.a = ctx.cpu.a.wrapping_add(adj);
+        let sum = ctx.cpu.a as u16 + adj as u16;
+        let result = sum as u8;
+
+        ctx.cpu.f.z = result == 0;
+        ctx.cpu.f.h = false;
+        ctx.cpu.f.c = carry;
+
+        ctx.cpu.a = result;
     }
-
-    ctx.cpu.f.h = false;
 
     op_fetch_next(ctx);
 }

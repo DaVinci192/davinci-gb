@@ -52,5 +52,10 @@ pub fn op_fetch_next(ctx: &mut CpuExec) {
 
     ctx.cpu.pc = ctx.cpu.pc.wrapping_add(1);
 
+    if ctx.cpu.pc == 0xFFFF {
+        println!("PC has reached 0xFFFF - M-cycles: {}", ctx.cpu.m_cycles);
+        std::process::exit(1);
+    }
+
     ctx.cpu.step = 0;
 }

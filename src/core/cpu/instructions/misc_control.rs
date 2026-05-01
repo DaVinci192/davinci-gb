@@ -1,17 +1,16 @@
 use crate::core::cpu::instructions::op_fetch_next;
+use crate::core::cpu::instructions::op_read_n8;
 
 use super::super::CpuExec;
 
 /* CB PREFIX */
-// this opcode is not used as CB is handled directly
 
 pub fn op_cb_prefix(ctx: &mut CpuExec) {
     debug_assert!(ctx.cpu.step == 1);
 
-    //let cb_opcode = ctx.bus.read8(ctx.cpu.pc);
-    ctx.cpu.pc += 1;
-
-    ctx.cpu.step = 1;
+    ctx.cpu.cb_prefix = true;
+    
+    op_fetch_next(ctx);
 }
 
 /* DI */
@@ -20,6 +19,7 @@ pub fn op_di(ctx: &mut CpuExec) {
     debug_assert!(ctx.cpu.step == 1);
 
     ctx.cpu.ime = false;
+    ctx.cpu.ime_scheduled = false;
 
     op_fetch_next(ctx);
 }
@@ -47,6 +47,8 @@ pub fn op_stop(ctx: &mut CpuExec) {
     debug_assert!(ctx.cpu.step == 1);
 
     // usually followed by a 0x00 byte
+    // read/discard next byte for now
+    op_read_n8(ctx);
 
     op_fetch_next(ctx);
 }
@@ -56,7 +58,7 @@ pub fn op_stop(ctx: &mut CpuExec) {
 pub fn op_halt(ctx: &mut CpuExec) {
     debug_assert!(ctx.cpu.step == 1);
 
-    let pending = ctx.cpu.ie & ctx.cpu.iflag;
+    let pending = ctx.bus.ie() & ctx.bus.iflag();
 
     if ctx.cpu.ime {
         ctx.cpu.halted = true;

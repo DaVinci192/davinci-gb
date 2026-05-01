@@ -13,7 +13,7 @@ pub fn alu_res(_cpu: &mut CPU, bit: u8, val: u8) -> u8 {
 }
 
 pub fn alu_set(_cpu: &mut CPU, bit: u8, val: u8) -> u8 {
-    val & (1u8 << bit)
+    val | (1u8 << bit)
 }
 
 pub fn alu_ccf(cpu: &mut CPU) {

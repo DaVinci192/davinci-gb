@@ -1,7 +1,7 @@
 use super::super::CPU;
 
 pub fn alu_rl(cpu: &mut CPU, val: u8) -> u8 {
-    let c = cpu.f.c as u8;
+    let c = if cpu.f.c { 0x01u8 } else {0x00u8 };
 
     let result = (val << 1) | c;
 
@@ -15,7 +15,7 @@ pub fn alu_rl(cpu: &mut CPU, val: u8) -> u8 {
 
 pub fn alu_rla(cpu: &mut CPU) {
     let a = cpu.a;
-    let c = cpu.f.c as u8;
+    let c = if cpu.f.c { 0x01u8 } else {0x00u8 };
 
     let result = (a << 1) | c;
 
@@ -53,7 +53,7 @@ pub fn alu_rlca(cpu: &mut CPU) {
 
 pub fn alu_rr(cpu: &mut CPU, val: u8) -> u8 {
     // 0bc0000000
-    let c = (cpu.f.c as u8).rotate_right(1); 
+    let c = if cpu.f.c { 0x80u8 } else { 0x00u8 }; 
 
     let result = (val >> 1) | c;
 
@@ -68,7 +68,7 @@ pub fn alu_rr(cpu: &mut CPU, val: u8) -> u8 {
 
 pub fn alu_rra(cpu: &mut CPU) {
     // 0bc0000000
-    let c = (cpu.f.c as u8).rotate_right(1); 
+    let c = if cpu.f.c { 0x80u8 } else { 0x00u8 }; 
     let a = cpu.a;
 
     let result = (a >> 1) | c;

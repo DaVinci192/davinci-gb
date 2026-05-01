@@ -58,20 +58,20 @@ impl CPU {
     pub fn set_reg16(&mut self, reg: Reg16, val: u16) {
         match reg {
             Reg16::AF => {
-                self.a = ((val | 0xFF00) >> 8) as u8;
-                self.f = super::Flags::from_u8(((val | 0x00FF) as u8) & 0xF0);
+                self.a = ((val & 0xFF00) >> 8) as u8;
+                self.f = super::Flags::from_u8(((val & 0x00FF) as u8) & 0xF0);
             },
             Reg16::BC => {
-                self.b = ((val | 0xFF00) >> 8) as u8;
-                self.c = (val | 0x00FF) as u8;
+                self.b = ((val & 0xFF00) >> 8) as u8;
+                self.c = (val & 0x00FF) as u8;
             },
             Reg16::DE => {
-                self.d = ((val | 0xFF00) >> 8) as u8;
-                self.e = (val | 0x00FF) as u8;
+                self.d = ((val & 0xFF00) >> 8) as u8;
+                self.e = (val & 0x00FF) as u8;
             },
             Reg16::HL => {
-                self.h = ((val | 0xFF00) >> 8) as u8;
-                self.l = (val | 0x00FF) as u8;
+                self.h = ((val & 0xFF00) >> 8) as u8;
+                self.l = (val & 0x00FF) as u8;
             },
         }
     }

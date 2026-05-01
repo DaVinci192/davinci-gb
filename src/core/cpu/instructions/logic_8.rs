@@ -52,6 +52,8 @@ pub fn op_and_a_n8(ctx: &mut CpuExec) {
 
 pub fn op_cpl(ctx: &mut CpuExec) {
     alu::alu_cpl(ctx.cpu);
+
+    op_fetch_next(ctx);
 }
 
 /* OR */

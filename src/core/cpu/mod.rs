@@ -7,6 +7,8 @@ pub mod instructions;
 pub mod flags;
 
 use flags::{Flags};
+use crate::core::cpu::instructions::misc_control::op_nop;
+
 use super::bus::Bus;
 
 pub type Op = fn(&mut CpuExec);
@@ -31,8 +33,6 @@ pub struct CPU {
 
     pub ime: bool,
     pub ime_scheduled: bool,
-    pub ie: u8,
-    pub iflag: u8,
 
     pub halted: bool,
     pub halt_bug: bool,
@@ -45,10 +45,49 @@ pub struct CPU {
     pub current_op: Op,
 
     pub m_cycles: u64,
-    pub t_cycles: u64,
+    t_cycle_curr: u8,
 }
 
 pub struct CpuExec<'a> {
     pub cpu: &'a mut CPU,
     pub bus: &'a mut Bus,
+}
+
+impl CPU {
+    pub fn new() -> Self {
+        Self {
+            a: 0x01,
+            f: Flags::from_u8(0xB0),
+            b: 0x00,
+            c: 0x13,
+            d: 0x00,
+            e: 0xD8,
+            h: 0x01,
+            l: 0x4D,
+            sp: 0xFFFE,
+            pc: 0x0100,
+            ir: 0,
+
+            cb_prefix: false,
+
+            ime: false,
+            ime_scheduled: false,
+
+            halted: false,
+            halt_bug: true,
+
+            temp: 0,
+            temp16: 0,
+
+            step: 1,
+            current_op: op_nop,
+
+            m_cycles: 0,
+            t_cycle_curr: 0,
+        }
+    }
+
+    pub fn reset(&mut self) {
+        *self = Self::new();
+    }
 }
