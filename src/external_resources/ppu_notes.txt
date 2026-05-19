@@ -1,0 +1,116 @@
+https://gbdev.io/pandocs/OAM.html
+https://github.com/Ashiepaws/GBEDG/blob/master/ppu/index.md#the-basics
+
+---------OAM----------
+
+OAM Scan takes 80 dots
+OAM is not accessible to CPU during OAM scan
+
+"During each scanline’s OAM scan, the PPU compares LY (using LCDC bit 2 to determine their size) to each object’s Y position to select up to 10 objects to be drawn on that line."
+
+OAM size is 160 bytes (0xA0)
+
+up to 10 objects are selected
+- assume the buffer stores 4 * 10 bytes
+- there are a total of 40 objects stored in OAM
+- assume the PPU scans/evaluates each object every 2 dots
+
+planned state machine for OAM object scan:
+    Dot 0: copy buffer data to internal register
+    Dot 1: evaluate whether to add object to buffer
+
+
+-------DRAWING--------
+
+PPU outputs one pixel/dot
+
+Pixel fetchers load FIFO registers
+- 4 different steps, each take 2 dots to complete
+    1. Fetch tile # (depends on bit 3/5 of LCDC) = 2 dots
+    2. Fetch tile data low (depends on bit 4 of LCDC) = 2 dots
+    3. Fetch tile data high = 2 dots
+    4. Sleep = 2 dots <-- conflicted documentation on this
+    4. Push to FIFO = attempt every dot until success
+
+Mental model:
+- think of background tilemap as fixed
+- SCX, SCY define the top left offset of the "viewport" on the background tilemap
+- when (SXC == WX - 7) and (SCY >= WY) the fetcher switches from background to window tilemap
+
+Fetch state machine:
+
+Background/Window fetcher states
+- fetch tile number (2 dot)
+- fetch low byte (2 dot)
+- fetch high byte (2 dot)
+- push to FIFO (1 dot)
+
+Sprite fetcher states (dots assumed):
+- fetch tile number (2 dot)
+- fetch low (1 dot)
+- fetch high (1 dot)
+- push to sprite FIFO (1 dot)
+
+BG Fetching state machine
+1. BG Fetch Tile #
+2. BG Fetch Tile low
+3: BG Fetch Tile high
+4: BG Sleep (2 dots)
+4: BG Push
+
+Sprite Fetching state machine:
+1. check fetcher_x == any(sprite_buffer.x)
+    yes => move next
+    no => cancel object fetch
+2. advance BG fetcher until BF Push or BG FIFO not empty
+3. 
+
+------ Scratch
+
+some fetcher struct members:
+- bg_fetch_state
+- tile_low
+- tile_high
+
+define a bg_fetch() function which takes 6 dots 
+define a sprite_fetch() function which takes 6 dots
+define a push_to_fifo(fifo: &mut VecDeque<u8>) function which takes 1 dot
+- pushes tile_low, tile_high into buffer
+define a render_pixel() function which always attempts to push a pixel to the LCD
+
+bg_fetch() operates based on an internal fetcher state, either fetching background tiles or window tiles
+
+------ Execution cases
+
+during normal execution:
+1. bg_fetch() (6 dots)
+2. push_to_fifo(bg_fifo) (1 dot), retried until succesful, usually twice
+
+render_pixel() is run every dot
+
+after last bg pixel is emitted:
+1. incur 6 dot penalty, pausing render_pixel. switch bg_fetch_state to window mode
+2. resume bg_fetch(), push_to_fifo() and render_pixel()
+
+if sprite encountered in middle of scanline:
+1. run bg_fetch until bg_fifo is not empty
+2. pause render_pixel(), reset curr_dot, effectively resetting bg_fetch first step. execute sprite_fetch() (6 dots)
+3. resume bg_fetch(), render_pixel(). since bg_fetch() takes 6 dots, and render_pixel() shifts out a pixel every dot, render_pixel might stall for additional dots since bg_fifo may be empty while bg_fetch is performed
+- if bg_fifo had 4 pixels remaining, render_pixel() will stall for (6 - 4) = 2 additional dots 
+- if bg_fifo had 1 pixels remaining, render_pixel() will stall for (6 - 1) = 5 additional dots
+- bg_fifo cannot have 0 pixels after resuming, because bg_fetch is only reset when bg_fifo is not empty
+=> bg_fifo has 0 pixels remaining: unreachable
+- if bg_fifo had >= 6 pixels remaining, render_pixel() is not stalled since it takes >= 6 dots to shift out the remaining pixels
+==> max penalty for sprite rendering = 6 + 5 = 11 dots
+==> min penalty for sprite rendering = 6 + 0 = 6  dots
+
+start of scanline,:
+1. bg_fetch(): 6 dots // discarded
+2. bg_fetch(): 6 dots = flat 12 dot penalty
+3. sprite_fetch
+3. shift SCX % 8 pixels out from bg_fifo: 0-7 dots
+4. start render_pixel() (because bg_fifo is no longer empty)
+
+sprite at start of scanline:
+
+
