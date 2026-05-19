@@ -1,16 +1,19 @@
+use crate::core::bus::cpu_bus_view::CpuBusView;
+
 use super::cpu::CPU;
 use super::bus::Bus;
-use super::cartridge::Cartridge;
 
 pub struct Gameboy {
     pub cpu: CPU,
     pub bus: Bus,
-    pub cartridge: Option<Cartridge>,
 }
 
 impl Gameboy {
     pub fn tick(&mut self) {
-        self.cpu.tick(&mut self.bus);
+        let cpu_bus_view = CpuBusView {
+            bus: &mut self.bus,
+        };
+        self.cpu.tick(cpu_bus_view);
         self.bus.tick_timer();
     }
 
@@ -34,7 +37,6 @@ impl Gameboy {
         Self {
             cpu: CPU::new(),
             bus: Bus::new(),
-            cartridge: None,
         }
     }
 

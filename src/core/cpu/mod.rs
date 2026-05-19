@@ -10,6 +10,7 @@ use flags::{Flags};
 use crate::core::cpu::instructions::misc_control::op_nop;
 
 use super::bus::Bus;
+use super::bus::cpu_bus_view::CpuBusView;
 
 pub type Op = fn(&mut CpuExec);
 
@@ -50,7 +51,7 @@ pub struct CPU {
 
 pub struct CpuExec<'a> {
     pub cpu: &'a mut CPU,
-    pub bus: &'a mut Bus,
+    pub bus: CpuBusView<'a>,
 }
 
 impl CPU {

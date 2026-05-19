@@ -1,4 +1,5 @@
 
+use crate::core::bus::cpu_bus_view::CpuBusView;
 use crate::core::cpu::CpuExec;
 use super::Bus;
 
@@ -8,18 +9,18 @@ use super::instructions::jumps_calls::{op_isr_40, op_isr_48, op_isr_50, op_isr_5
 use super::instructions::op_fetch_next;
 
 impl CPU {
-    pub fn step_instruction(&mut self, bus: &mut Bus) {
-        loop {
-            self.cycle(bus);
-            if self.step == 0 {
-                break;
-            }
-        }
-    }
+    // pub fn step_instruction(&mut self, bus_view: CpuBusView) {
+    //     loop {
+    //         self.cycle(bus_view);
+    //         if self.step == 0 {
+    //             break;
+    //         }
+    //     }
+    // }
 
     // step by m-cycle
-    pub fn cycle(&mut self, bus: &mut Bus) {
-        let mut ctx = CpuExec { cpu: self, bus };
+    pub fn cycle(&mut self, bus_view: CpuBusView) {
+        let mut ctx = CpuExec { cpu: self, bus: bus_view };
 
         if ctx.cpu.halted {
             if (ctx.bus.ie() & ctx.bus.iflag()) != 0 {
@@ -48,9 +49,9 @@ impl CPU {
     }
 
     // step by t-cycle
-    pub fn tick(&mut self, bus: &mut Bus) {
+    pub fn tick(&mut self, bus_view: CpuBusView) {
         if self.t_cycle_curr == 3 {
-            self.cycle(bus);
+            self.cycle(bus_view);
             self.t_cycle_curr = 0;
         } else {
             self.t_cycle_curr += 1;
