@@ -15,7 +15,7 @@ use eframe::{egui};
 
 fn main() {
     let mut gb = Gameboy::new();
-    let bytes = std::fs::read("src/tests/gb-test-roms-master/cpu_instrs/cpu_instrs.gb").unwrap();
+    let bytes = std::fs::read("src/tests/gb-test-roms-master/mem_timing-2/mem_timing.gb").unwrap();
         
     gb.load_rom(&bytes);
 
