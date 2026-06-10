@@ -43,6 +43,7 @@ impl Debugger {
 
     pub fn load_rom(&mut self, path: &str) {
         let bytes = std::fs::read(path).unwrap();
+        
         self.gb.load_rom(&bytes);
     }
 

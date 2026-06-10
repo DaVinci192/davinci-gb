@@ -35,8 +35,8 @@ impl From<&Bus> for BusSnapshot {
 
             serial_output: bus.serial.serial_output.clone(),
 
-            sb: bus.memory[0xFF01],
-            sc: bus.memory[0xFF02],
+            sb: bus.read8(0xFF01),
+            sc: bus.read8(0xFF02),
 
             ie: bus.ie(),
             iflag: bus.iflag(),
