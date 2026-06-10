@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use eframe::egui::{self, FontData, FontDefinitions, FontFamily};
 use eframe::App;
+use crate::core::bus::{serial, timer};
 use crate::debugger::debug_view::DebuggerView;
 use crate::frontend::layout::RIGHT_PANEL_WIDTH;
 use crate::frontend::panels::cpu::control::ControlPanelState;
@@ -40,39 +41,56 @@ impl Frontend {
         replace_fonts(&cc.egui_ctx);
         configure_text_styles(&cc.egui_ctx);
         
+
+        let mut debugger = Debugger::new();
+        debugger.load_rom("src/tests/cpu_instrs/individual/10-bit ops.gb");
+
+        let control_panel = ControlPanelState::default();
+        let register_panel = RegisterPanelState::default();
+        let interrupt_panel = InterruptPanelState::default();
+        let metrics_panel = MetricPanelState::default();
+        let disassembler_panel = DisassemblerPanelState::default();
+        let serial_panel = SerialPanelState::default();
+        let timer_panel = TimerPanelState::default();
+
         // set_visuals(&cc.egui_ctx);
+        let frontend = Self {
+            debugger: debugger,
 
-        let mut frontend = Self {
-            debugger: Debugger::new(),
-
-            control_panel: ControlPanelState::default(),
-            register_panel: RegisterPanelState::default(),
-            interrupt_panel: InterruptPanelState::default(),
-            metrics_panel: MetricPanelState::default(),
-            disassembler_panel: DisassemblerPanelState::default(),
-            serial_panel: SerialPanelState::default(),
-            timer_panel: TimerPanelState::default(),
+            control_panel: control_panel,
+            register_panel: register_panel,
+            interrupt_panel: interrupt_panel,
+            metrics_panel: metrics_panel,
+            disassembler_panel: disassembler_panel,
+            serial_panel: serial_panel,
+            timer_panel: timer_panel,
 
             last_time: std::time::Instant::now(),
             accumulator: 0.0,
         };
 
+        // let bytes = vec![0u8; 16];
 
-        frontend.debugger.load_rom("D:/EmulationDev/davinci_gb/src/tests/cpu_instrs/individual/03-op sp,hl.gb");
+        frontend
+        
+        // let bytes = std::fs::read("src/tests/cpu_instrs/individual/10-bit ops.gb").unwrap();
+        // frontend.debugger.gb.load_rom(&bytes);
+
+        // frontend.debugger.load_rom("src/tests/cpu_instrs/individual/10-bit ops.gb");
         // let N = 5_001_264; // RST near 5001264
         // let N = 478_500; // after serial = 150_000
         // let N = 478_900;
         // OP LD SP,HL - M-cycles: 479178
-        let N = 479_170;
-        let mut n = 0;
-        loop {
-            frontend.debugger.step_cycle();
-            n += 1;
+        // let N = 479_170;
+        // let mut n = 0;
+        // loop {
+        //     frontend.debugger.step_cycle();
+        //     n += 1;
             
-            if n >= N { break; }
-        }
+        //     if n >= N { break; }
+        // }
 
-        frontend
+        // frontend
     }
 }
 

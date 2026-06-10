@@ -43,9 +43,7 @@ impl Gameboy {
     pub fn load_rom(&mut self, data: &[u8]) {
         self.reset();
 
-        for (i, b) in data.iter().enumerate() {
-            self.bus.memory[i] = *b;
-        }
+        self.bus.cartridge.load_rom(data);
 
         // self.cpu.a = 0x02;
 

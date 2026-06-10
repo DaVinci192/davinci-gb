@@ -77,8 +77,6 @@ pub enum Interrupt {
 }
 
 pub struct Bus {
-    pub memory: [u8; 0x10000], 
-
     iflag: u8,
     ie: u8,
 
@@ -208,9 +206,7 @@ impl Bus {
 
 impl Bus {
     pub fn new() -> Self {
-        let mut b = Self { 
-            memory: [0; 0x10000],
-
+        let b = Self { 
             iflag: 0xE1,
             ie: 0,
 
@@ -238,14 +234,14 @@ impl Bus {
             ir: IR::new(),
         };
 
-        b.memory[0xFF01] = 0x00; // SB
-        b.memory[0xFF02] = 0x7E; // SC
-
-        b.memory[0xFF05] = 0; // TIMA
-        b.memory[0xFF06] = 0; // TMA
-        b.memory[0xFF07] = 0xF8; // TAC
-
-        b.memory[0xFF0F] = 0xE1; // IF
+        // handled in Serial struct
+        // b.write8(0xFF01, 0x00); // SB
+        // b.write8(0xFF02, 0x7E); // SC 
+        
+        // handled in Timer struct
+        // b.write8(0xFF05, 0); // TIMA
+        // b.write8(0xFF06, 0); // TMA
+        // b.write8(0xFF07, 0xF8); // TAC
 
         b
     }
