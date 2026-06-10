@@ -1,7 +1,5 @@
 // minimal cartridge with no MBC
 
-const RAM_OFFSET: usize = 0xA000;
-
 const ROM_LO: u16 = 0x0000;
 const ROM_HI: u16 = 0x7FFF;
 
@@ -35,6 +33,12 @@ impl Cartridge {
             ROM_LO..=ROM_HI => {}, // read only - do nothing
             RAM_LO..=RAM_HI => self.ram[(address - RAM_LO) as usize] = val,
             _ => unreachable!(),
+        }
+    }
+
+    pub fn load_rom(&mut self, rom: &[u8]) {
+        for (i, b) in rom.iter().enumerate() {
+            self.rom[i] = *b;
         }
     }
 }
